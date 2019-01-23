@@ -351,7 +351,14 @@ function! s:ensure_start(buf, server_name, cb) abort
         call lsp#log(l:msg)
         call a:cb(l:msg)
     else
-        let l:msg = s:new_rpc_error('failed to start server', { 'server_name': a:server_name, 'cmd': l:cmd })
+        let l:msg = 'failed to start server'
+        let l:job_error_unsupported_job_type = -2 " async.vim: unsupported job type
+        if l:lsp_id == l:job_error_unsupported_job_type
+            let l:msg .= ' (unsupported_job_type. see async.vim)'
+        else
+            let l:msg .= ' (job failed to run. try calling job_start directly)'
+        endif
+        let l:msg = s:new_rpc_error(l:msg, { 'server_name': a:server_name, 'cmd': l:cmd })
         call lsp#log(l:msg)
         call a:cb(l:msg)
     endif
